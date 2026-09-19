@@ -8,7 +8,7 @@ import Avatar, {
   PANTS,
   SHIRTS,
 } from "./components/avatar";
-import { LockIcon, PantsIcon, ShirtIcon } from "./components/icons";
+import { PantsIcon, ShirtIcon } from "./components/icons";
 import { TOTAL_ITEMS } from "./lib/rewards";
 import { useUnlocked } from "./lib/use-unlocked";
 
@@ -20,9 +20,12 @@ export default function Home() {
   const [tab, setTab] = useState<Tab>("shirts");
   const unlocked = useUnlocked();
 
-  const list = tab === "shirts" ? SHIRTS : PANTS;
   const selected: string = tab === "shirts" ? shirt : pants;
-  const unlockedIds: string[] = tab === "shirts" ? unlocked.shirts : unlocked.pants;
+  const unlockedIds: string[] =
+    tab === "shirts" ? unlocked.shirts : unlocked.pants;
+  const list = (tab === "shirts" ? SHIRTS : PANTS).filter((style) =>
+    unlockedIds.includes(style.id),
+  );
   const unlockedCount = unlocked.shirts.length + unlocked.pants.length;
 
   function selectItem(id: string) {
@@ -74,25 +77,19 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap gap-3">
             {list.map((style) => {
-              const isUnlocked = unlockedIds.includes(style.id);
               const isSelected = selected === style.id;
               return (
                 <button
                   key={style.id}
                   type="button"
-                  disabled={!isUnlocked}
                   onClick={() => selectItem(style.id)}
-                  title={isUnlocked ? style.name : "Locked — play to unlock"}
-                  aria-label={
-                    isUnlocked ? style.name : `${style.name} (locked)`
-                  }
+                  title={style.name}
+                  aria-label={style.name}
                   aria-pressed={isSelected}
-                  className={`relative flex h-24 w-16 items-center justify-center rounded-lg border transition-colors ${
-                    !isUnlocked
-                      ? "cursor-not-allowed border-black/[.08] opacity-60 dark:border-white/[.145]"
-                      : isSelected
-                        ? "cursor-pointer border-black dark:border-white"
-                        : "cursor-pointer border-black/[.08] hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-white/[.08]"
+                  className={`flex h-24 w-16 cursor-pointer items-center justify-center rounded-lg border transition-colors ${
+                    isSelected
+                      ? "border-black dark:border-white"
+                      : "border-black/[.08] hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-white/[.08]"
                   }`}
                 >
                   <Avatar
@@ -100,11 +97,6 @@ export default function Home() {
                     pants={tab === "pants" ? (style.id as Pants) : pants}
                     size="h-20 w-14"
                   />
-                  {!isUnlocked && (
-                    <span className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-zinc-900/80 text-[10px] text-white dark:bg-white/80 dark:text-black">
-                      <LockIcon />
-                    </span>
-                  )}
                 </button>
               );
             })}
