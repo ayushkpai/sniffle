@@ -5,6 +5,39 @@ import Avatar, { type Pants, type Shirt, PANTS, SHIRTS } from "./components/avat
 
 type Tab = "shirts" | "pants";
 
+function ShirtIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 4 L4 7 L6 10 L8 9 L9 14 L15 14 L16 9 L18 10 L20 7 L15 4 L12 6 Z" />
+      <path d="M9 14 V20 M15 14 V20" />
+    </svg>
+  );
+}
+
+function PantsIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 4 H19 L18 9 V20 H14.5 V12 H9.5 V20 H6 V9 Z" />
+    </svg>
+  );
+}
+
 export default function Home() {
   const [shirt, setShirt] = useState<Shirt>("tee");
   const [pants, setPants] = useState<Pants>("jeans");
@@ -31,13 +64,14 @@ export default function Home() {
                 type="button"
                 onClick={() => setTab(t)}
                 aria-pressed={tab === t}
-                className={`flex-1 cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium capitalize transition-colors ${
+                aria-label={t}
+                className={`flex flex-1 cursor-pointer items-center justify-center rounded-md px-3 py-2 transition-colors ${
                   tab === t
                     ? "bg-white text-black shadow-sm dark:bg-zinc-800 dark:text-zinc-50"
                     : "text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-zinc-50"
                 }`}
               >
-                {t}
+                {t === "shirts" ? <ShirtIcon /> : <PantsIcon />}
               </button>
             ))}
           </div>
