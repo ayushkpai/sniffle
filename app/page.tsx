@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Face, { type Cap, CAPS } from "./components/face";
+import Avatar, { type Cap, CAPS } from "./components/avatar";
 
 export default function Home() {
   const [cap, setCap] = useState<Cap | undefined>("beanie");
@@ -10,7 +10,7 @@ export default function Home() {
     <main className="flex w-full max-w-3xl flex-1 flex-col items-center gap-6 px-6 py-12">
       <div className="flex w-full gap-6">
         <div className="h-64 w-1/3 rounded-xl border border-black/[.08] dark:border-white/[.145]">
-          <Face cap={cap} />
+          <Avatar cap={cap} />
         </div>
         <div className="flex h-64 flex-1 flex-col gap-4 rounded-xl border border-black/[.08] p-4 dark:border-white/[.145]">
           <h2 className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
@@ -30,7 +30,7 @@ export default function Home() {
                 aria-pressed={cap === style.id}
                 aria-label={style.name}
               >
-                <Face cap={style.id} size="h-16 w-16" />
+                <Avatar cap={style.id} size="h-20 w-14" />
               </button>
             ))}
           </div>
