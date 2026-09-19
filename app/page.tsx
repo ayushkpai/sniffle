@@ -52,11 +52,11 @@ export default function Home() {
         </Link>
       </div>
 
-      <div className="flex w-full gap-6">
+      <div className="flex w-full items-start gap-6">
         <div className="flex h-64 w-1/3 items-center justify-center rounded-xl border border-black/[.08] dark:border-white/[.145]">
           <Avatar shirt={shirt} pants={pants} />
         </div>
-        <div className="flex h-64 flex-1 flex-col gap-4 rounded-xl border border-black/[.08] p-4 dark:border-white/[.145]">
+        <div className="flex h-auto min-h-64 flex-1 flex-col gap-4 rounded-xl border border-black/[.08] p-4 dark:border-white/[.145]">
           <div className="flex gap-1 rounded-lg bg-black/[.06] p-1 dark:bg-white/[.08]">
             {(["shirts", "pants"] as Tab[]).map((t) => (
               <button
