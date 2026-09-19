@@ -1,4 +1,5 @@
 export type Shirt = "tee" | "polo" | "hoodie" | "sweater";
+export type Pants = "jeans" | "shorts" | "cargo" | "sweat";
 
 function shirtColor(shirt: Shirt): string {
   switch (shirt) {
@@ -86,12 +87,54 @@ export function ShirtBody({ shirt }: { shirt: Shirt }) {
   );
 }
 
+export function PantsBody({ pants }: { pants: Pants }) {
+  if (pants === "shorts") {
+    return (
+      <g id="legs">
+        <rect x="74" y="215" width="20" height="26" rx="6" fill="#f59e0b" />
+        <rect x="106" y="215" width="20" height="26" rx="6" fill="#f59e0b" />
+        <rect x="74" y="241" width="20" height="30" rx="8" fill="#fcd9b8" />
+        <rect x="106" y="241" width="20" height="30" rx="8" fill="#fcd9b8" />
+        <ellipse cx="84" cy="275" rx="16" ry="8" fill="#f59e0b" />
+        <ellipse cx="116" cy="275" rx="16" ry="8" fill="#f59e0b" />
+      </g>
+    );
+  }
+  const color =
+    pants === "cargo" ? "#78716c" : pants === "sweat" ? "#475569" : "#3b82f6";
+  return (
+    <g id="legs">
+      <rect x="74" y="215" width="20" height="55" rx="8" fill={color} />
+      <rect x="106" y="215" width="20" height="55" rx="8" fill={color} />
+      {pants === "cargo" && (
+        <g fill="#57534e">
+          <rect x="62" y="224" width="12" height="14" rx="3" />
+          <rect x="126" y="224" width="12" height="14" rx="3" />
+        </g>
+      )}
+      {pants === "sweat" && (
+        <g fill="#334155">
+          <rect x="76" y="260" width="16" height="10" rx="4" />
+          <rect x="108" y="260" width="16" height="10" rx="4" />
+        </g>
+      )}
+      <ellipse cx="84" cy="275" rx="16" ry="8" fill="#f59e0b" />
+      <ellipse cx="116" cy="275" rx="16" ry="8" fill="#f59e0b" />
+    </g>
+  );
+}
+
 interface AvatarProps {
   shirt?: Shirt;
+  pants?: Pants;
   size?: string;
 }
 
-export default function Avatar({ shirt = "tee", size = "h-40 w-32" }: AvatarProps) {
+export default function Avatar({
+  shirt = "tee",
+  pants = "jeans",
+  size = "h-40 w-32",
+}: AvatarProps) {
   return (
     <div className="flex h-full w-full items-center justify-center">
       <svg
@@ -100,12 +143,7 @@ export default function Avatar({ shirt = "tee", size = "h-40 w-32" }: AvatarProp
         role="img"
         aria-label="Avatar preview"
       >
-        <g id="legs">
-          <rect x="74" y="215" width="20" height="55" rx="8" fill="#52525b" />
-          <rect x="106" y="215" width="20" height="55" rx="8" fill="#52525b" />
-          <ellipse cx="84" cy="275" rx="16" ry="8" fill="#f59e0b" />
-          <ellipse cx="116" cy="275" rx="16" ry="8" fill="#f59e0b" />
-        </g>
+        <PantsBody pants={pants} />
         {shirt && <ShirtBody shirt={shirt} />}
         <g id="head">
           <circle cx="100" cy="70" r="55" fill="#fcd9b8" />
@@ -131,4 +169,11 @@ export const SHIRTS: { id: Shirt; name: string }[] = [
   { id: "polo", name: "Polo" },
   { id: "hoodie", name: "Hoodie" },
   { id: "sweater", name: "Sweater" },
+];
+
+export const PANTS: { id: Pants; name: string }[] = [
+  { id: "jeans", name: "Jeans" },
+  { id: "shorts", name: "Shorts" },
+  { id: "cargo", name: "Cargo" },
+  { id: "sweat", name: "Sweatpants" },
 ];
