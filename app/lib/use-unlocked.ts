@@ -1,40 +1,66 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import {
-  defaultUnlocked,
-  getUnlockedRaw,
-  loadUnlocked,
-  UNLOCK_EVENT,
-  type Unlocked,
-} from "./rewards";
+import { defaultUnlocked, type Unlocked } from "./rewards";
 
-let cachedRaw: string | null = null;
-let cached: Unlocked = defaultUnlocked;
+let state: Unlocked = defaultUnlocked;
+let loading = false;
+const listeners = new Set<() => void>();
+
+function emit() {
+  for (const listener of listeners) listener();
+}
+
+function setState(next: Unlocked) {
+  state = next;
+  emit();
+}
+
+async function fetchUnlocked() {
+  if (loading) return;
+  loading = true;
+  try {
+    const res = await fetch("/api/unlocked", { cache: "no-store" });
+    if (res.ok) setState((await res.json()) as Unlocked);
+  } catch {
+    // keep current state on network failure
+  } finally {
+    loading = false;
+  }
+}
+
+function subscribe(callback: () => void) {
+  listeners.add(callback);
+  void fetchUnlocked();
+  return () => {
+    listeners.delete(callback);
+  };
+}
 
 function getSnapshot(): Unlocked {
-  const raw = getUnlockedRaw();
-  if (raw !== cachedRaw) {
-    cachedRaw = raw;
-    cached = loadUnlocked();
-  }
-  return cached;
+  return state;
 }
 
 function getServerSnapshot(): Unlocked {
   return defaultUnlocked;
 }
 
-function subscribe(callback: () => void) {
-  if (typeof window === "undefined") return () => {};
-  window.addEventListener("storage", callback);
-  window.addEventListener(UNLOCK_EVENT, callback);
-  return () => {
-    window.removeEventListener("storage", callback);
-    window.removeEventListener(UNLOCK_EVENT, callback);
-  };
-}
-
 export function useUnlocked(): Unlocked {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
+export async function submitScore(score: number): Promise<string[]> {
+  try {
+    const res = await fetch("/api/unlocked", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ score }),
+    });
+    if (!res.ok) return [];
+    const data = (await res.json()) as { earned: string[]; unlocked: Unlocked };
+    setState(data.unlocked);
+    return data.earned;
+  } catch {
+    return [];
+  }
 }

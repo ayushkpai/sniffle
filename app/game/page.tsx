@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { PantsIcon, ShirtIcon } from "../components/icons";
-import { applyScore, itemName, TOTAL_ITEMS, UNLOCK_TIERS, type Unlocked } from "../lib/rewards";
+import { itemName, TOTAL_ITEMS, UNLOCK_TIERS } from "../lib/rewards";
+import { submitScore, useUnlocked } from "../lib/use-unlocked";
 
 const GAME_SECONDS = 30;
 const KINDS = ["shirt", "pants"] as const;
@@ -33,7 +34,7 @@ export default function GamePage() {
   const [timeLeft, setTimeLeft] = useState(GAME_SECONDS);
   const [target, setTarget] = useState<Target>(() => randomTarget(0));
   const [earned, setEarned] = useState<string[]>([]);
-  const [unlocked, setUnlocked] = useState<Unlocked | null>(null);
+  const unlocked = useUnlocked();
 
   const scoreRef = useRef(0);
   const endAtRef = useRef(0);
@@ -50,10 +51,10 @@ export default function GamePage() {
       setTimeLeft(remaining);
       if (remaining <= 0) {
         clearInterval(id);
-        const result = applyScore(scoreRef.current);
-        setEarned(result.earned);
-        setUnlocked(result.unlocked);
-        setPhase("done");
+        void submitScore(scoreRef.current).then((newItems) => {
+          setEarned(newItems);
+          setPhase("done");
+        });
       }
     }, 200);
 
@@ -75,9 +76,7 @@ export default function GamePage() {
     setTarget(randomTarget(Date.now()));
   }
 
-  const unlockedCount = unlocked
-    ? unlocked.shirts.length + unlocked.pants.length
-    : 0;
+  const unlockedCount = unlocked.shirts.length + unlocked.pants.length;
 
   return (
     <main className="flex w-full max-w-3xl flex-1 flex-col items-center gap-6 px-6 py-12">
@@ -160,12 +159,10 @@ export default function GamePage() {
                 <span className="font-medium text-black dark:text-zinc-50">
                   {earned.join(", ")}
                 </span>
-                {unlocked && (
-                  <span className="text-zinc-500 dark:text-zinc-400">
-                    {" "}
-                    ({unlockedCount}/{TOTAL_ITEMS} items)
-                  </span>
-                )}
+                <span className="text-zinc-500 dark:text-zinc-400">
+                  {" "}
+                  ({unlockedCount}/{TOTAL_ITEMS} items)
+                </span>
               </p>
             ) : (
               <p className="max-w-sm text-sm text-zinc-500 dark:text-zinc-400">

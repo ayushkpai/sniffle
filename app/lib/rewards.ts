@@ -1,10 +1,6 @@
 import type { Pants, Shirt } from "../components/avatar";
 import { PANTS, SHIRTS } from "../components/avatar";
 
-const STORAGE_KEY = "sniffle-unlocked";
-
-export const UNLOCK_EVENT = "sniffle-unlocked";
-
 export interface Unlocked {
   shirts: Shirt[];
   pants: Pants[];
@@ -57,51 +53,20 @@ export const UNLOCK_TIERS: UnlockTier[] = REWARD_SHIRTS.flatMap(
 
 export const TOTAL_ITEMS = SHIRTS.length + PANTS.length;
 
-function cloneDefaults(): Unlocked {
-  return { shirts: [...defaultUnlocked.shirts], pants: [...defaultUnlocked.pants] };
-}
-
-export function loadUnlocked(): Unlocked {
-  if (typeof window === "undefined") return cloneDefaults();
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return cloneDefaults();
-    const parsed = JSON.parse(raw) as Partial<Unlocked>;
-    return {
-      shirts: parsed.shirts?.length ? parsed.shirts : [...defaultUnlocked.shirts],
-      pants: parsed.pants?.length ? parsed.pants : [...defaultUnlocked.pants],
-    };
-  } catch {
-    return cloneDefaults();
-  }
-}
-
-export function getUnlockedRaw(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return window.localStorage.getItem(STORAGE_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function saveUnlocked(unlocked: Unlocked) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(unlocked));
-    window.dispatchEvent(new Event(UNLOCK_EVENT));
-  } catch {
-    // ignore write failures (private mode, quota, etc.)
-  }
-}
-
 export function itemName(kind: "shirts" | "pants", id: string): string {
   const list = kind === "shirts" ? SHIRTS : PANTS;
   return list.find((item) => item.id === id)?.name ?? id;
 }
 
-export function applyScore(score: number): { earned: string[]; unlocked: Unlocked } {
-  const unlocked = loadUnlocked();
+function cloneUnlocked(unlocked: Unlocked): Unlocked {
+  return { shirts: [...unlocked.shirts], pants: [...unlocked.pants] };
+}
+
+export function mergeScore(
+  current: Unlocked,
+  score: number,
+): { unlocked: Unlocked; earned: string[] } {
+  const unlocked = cloneUnlocked(current);
   const earned: string[] = [];
 
   for (const tier of UNLOCK_TIERS) {
@@ -116,6 +81,5 @@ export function applyScore(score: number): { earned: string[]; unlocked: Unlocke
     }
   }
 
-  saveUnlocked(unlocked);
-  return { earned, unlocked };
+  return { unlocked, earned };
 }
