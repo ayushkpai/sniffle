@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { PantsIcon, ShirtIcon } from "../components/icons";
-import { applyScore, TOTAL_ITEMS, type Unlocked } from "../lib/rewards";
+import { applyScore, itemName, TOTAL_ITEMS, UNLOCK_TIERS, type Unlocked } from "../lib/rewards";
 
 const GAME_SECONDS = 30;
 const KINDS = ["shirt", "pants"] as const;
@@ -169,8 +169,8 @@ export default function GamePage() {
               </p>
             ) : (
               <p className="max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
-                No new items this round — score 3, 6, 9, 12, 15, or 18 to earn
-                rewards.
+                No new items this round — keep playing to reach the next reward
+                target.
               </p>
             )}
             <div className="mt-2 flex gap-3">
@@ -197,21 +197,21 @@ export default function GamePage() {
           Reward targets
         </h2>
         <ul className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-zinc-700 sm:grid-cols-3 dark:text-zinc-300">
-          {[
-            ["Polo", 3],
-            ["Shorts", 6],
-            ["Hoodie", 9],
-            ["Cargo", 12],
-            ["Sweater", 15],
-            ["Sweatpants", 18],
-          ].map(([name, threshold]) => (
-            <li key={name} className="flex items-center justify-between">
-              <span>{name}</span>
-              <span className="font-medium text-black dark:text-zinc-50">
-                {threshold}
-              </span>
-            </li>
-          ))}
+          {UNLOCK_TIERS.map((tier) => {
+            const kind = tier.shirt ? "shirts" : "pants";
+            const id = tier.shirt ?? tier.pants ?? "";
+            return (
+              <li
+                key={`${kind}-${id}`}
+                className="flex items-center justify-between"
+              >
+                <span>{itemName(kind, id)}</span>
+                <span className="font-medium text-black dark:text-zinc-50">
+                  {tier.score}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </main>

@@ -24,14 +24,36 @@ export interface UnlockTier {
   pants?: Pants;
 }
 
-export const UNLOCK_TIERS: UnlockTier[] = [
-  { score: 3, shirt: "polo" },
-  { score: 6, pants: "shorts" },
-  { score: 9, shirt: "hoodie" },
-  { score: 12, pants: "cargo" },
-  { score: 15, shirt: "sweater" },
-  { score: 18, pants: "sweat" },
+const REWARD_SHIRTS: Shirt[] = [
+  "polo",
+  "tank",
+  "denim",
+  "plaid",
+  "jersey",
+  "turtleneck",
+  "vest",
+  "hoodie",
+  "sweater",
 ];
+
+const REWARD_PANTS: Pants[] = [
+  "shorts",
+  "chinos",
+  "cargo",
+  "joggers",
+  "leggings",
+  "slacks",
+  "sweat",
+  "parachute",
+  "bootcut",
+];
+
+export const UNLOCK_TIERS: UnlockTier[] = REWARD_SHIRTS.flatMap(
+  (shirt, i) => [
+    { score: 2 + i * 4, shirt },
+    { score: 4 + i * 4, pants: REWARD_PANTS[i] },
+  ],
+);
 
 export const TOTAL_ITEMS = SHIRTS.length + PANTS.length;
 
